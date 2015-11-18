@@ -13,6 +13,7 @@ set -x
 distro=${distro:-ubuntu}
 WORKSPACE=${WORKSPACE:-${HOME}/${RANDOM}${RANDOM}}
 http_proxy=${http_proxy:-}
+CROSS_COMPILER=""
 
 # Timestamp for job
 echo "Build started, $(date)"
@@ -87,9 +88,9 @@ cd linux-aspeed
 
 # Configure a build
 if [ "${distro}" == "fedora" ]; then
-  CROSS_COMPILER=arm-linux-gnu-
+  CROSS_COMPILER="arm-linux-gnu-"
 else
-  CROSS_COMPILER=arm-none-eabi-
+  CROSS_COMPILER="arm-none-eabi-"
 fi
 
 ARCH=arm CROSS_COMPILE=${CROSS_COMPILER} make aspeed_defconfig
