@@ -72,7 +72,7 @@ EOF
 elif [[ "${distro}" == ubuntu ]]; then
 
   Dockerfile=$(cat << EOF
-FROM ubuntu:15.10
+FROM ubuntu:16.10
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -yy \
