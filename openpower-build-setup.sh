@@ -97,6 +97,7 @@ RUN apt-get update && apt-get install -yy \
 	texinfo \
 	unzip \
 	vim-common \
+	rsync \
 	wget\
 	xsltproc
 
