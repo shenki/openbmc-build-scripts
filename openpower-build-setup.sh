@@ -4,7 +4,6 @@
 #
 # It expects a few variables which are part of Jenkins build job matrix:
 #   target = palmetto|qemu|habanero|firestone|garrison
-#   distro = ubuntu
 #   WORKSPACE =
 
 # Trace bash processing
@@ -12,7 +11,6 @@ set -xeo pipefail
 
 # Default variables
 target=${target:-palmetto}
-distro=${distro:-ubuntu}
 WORKSPACE=${WORKSPACE:-${HOME}/${RANDOM}${RANDOM}}
 http_proxy=${http_proxy:-}
 
@@ -20,58 +18,8 @@ http_proxy=${http_proxy:-}
 echo "Build started, $(date)"
 
 # Configure docker build
-if [[ "${distro}" == fedora ]];then
 
-  Dockerfile=$(cat << EOF
-FROM fedora:latest
-
-RUN dnf --refresh repolist && dnf install -y \
-	bc \
-	bison \
-	bzip2 \
-	cpio \
-  	cscope \
-	ctags \
-	expat-devel \
-	findutils \
-	flex \
-	gcc-c++ \
-	git \
-	libxml2-devel \
-	ncurses-devel \
-	openssl-devel \
-	patch \
-	perl \
-	perl-bignum \
-	"perl(Digest::SHA1)" \
-	"perl(Env)" \
-	"perl(Fatal)" \
-	"perl(Thread::Queue)" \
-	"perl(XML::SAX)" \
-	"perl(XML::Simple)" \
-	"perl(YAML)" \
-	"perl(XML::LibXML)" \
-	python \
-	tar \
-	unzip \
-	vim \
-	wget \
-	which \
-	zlib-devel \
-	zlib-static
-
-RUN grep -q ${GROUPS} /etc/group || groupadd -g ${GROUPS} ${USER}
-RUN grep -q ${UID} /etc/passwd || useradd -d ${HOME} -m -u ${UID} -g ${GROUPS} ${USER}
-
-USER ${USER}
-ENV HOME ${HOME}
-RUN /bin/bash
-EOF
-)
-
-elif [[ "${distro}" == ubuntu ]]; then
-
-  Dockerfile=$(cat << EOF
+Dockerfile=$(cat << EOF
 FROM ubuntu:18.04
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -109,10 +57,9 @@ ENV HOME ${HOME}
 RUN /bin/bash
 EOF
 )
-fi
 
 # Build the docker container
-docker build -t op-build/${distro} - <<< "${Dockerfile}"
+docker build -t op-build/ubuntu - <<< "${Dockerfile}"
 if [[ "$?" -ne 0 ]]; then
   echo "Failed to build docker container."
   exit 1
@@ -146,7 +93,7 @@ chmod a+x ${WORKSPACE}/build.sh
 
 # Run the docker container, execute the build script we just built
 docker run --net=host --rm=true -e WORKSPACE=${WORKSPACE} --user="${USER}" \
-  -w "${HOME}" -v "${HOME}":"${HOME}" -t op-build/${distro} ${WORKSPACE}/build.sh
+  -w "${HOME}" -v "${HOME}":"${HOME}" -t op-build/ubuntu ${WORKSPACE}/build.sh
 
 # Create link to images for archiving
 ln -sf ${WORKSPACE}/op-build/output/images ${WORKSPACE}/images
