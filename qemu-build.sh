@@ -52,7 +52,7 @@ export PROXY_HOST=${http_proxy/#http*:\/\/}
 export PROXY_HOST=${PROXY_HOST/%:[0-9]*}
 export PROXY_PORT=${http_proxy/#http*:\/\/*:}
 
-mkdir -p ${WORKSPACE}
+ls
 
 cat > "${WORKSPACE}"/build.sh << EOF_SCRIPT
 #!/bin/bash
